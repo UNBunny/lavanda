@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="002-create-materials-table" author="lavanda-system">
+        <comment>Создание таблицы материалов для флористического учета</comment>
+        
+        <createTable tableName="materials">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="description" type="TEXT"/>
+            
+            <column name="price_per_meter" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="stock_meters" type="DECIMAL(10,2)" defaultValue="0.00">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="reserved_meters" type="DECIMAL(10,2)" defaultValue="0.00">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="supplier" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="supplier_contact" type="VARCHAR(100)"/>
+            
+            <column name="color" type="VARCHAR(50)"/>
+            
+            <column name="width" type="VARCHAR(50)"/>
+            
+            <column name="material" type="VARCHAR(100)"/>
+            
+            <column name="notes" type="TEXT"/>
+            
+            <column name="is_active" type="BOOLEAN" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Комментарии к таблице и колонкам -->
+        <sql>
+            COMMENT ON TABLE materials IS 'Таблица материалов для флористического учета LAVANDA ERP';
+            COMMENT ON COLUMN materials.id IS 'Уникальный идентификатор материала';
+            COMMENT ON COLUMN materials.name IS 'Название материала';
+            COMMENT ON COLUMN materials.type IS 'Тип материала (RIBBON, WRAPPING_PAPER, WIRE и т.д.)';
+            COMMENT ON COLUMN materials.description IS 'Описание материала';
+            COMMENT ON COLUMN materials.price_per_meter IS 'Цена за метр в рублях';
+            COMMENT ON COLUMN materials.stock_meters IS 'Количество на складе (метры)';
+            COMMENT ON COLUMN materials.reserved_meters IS 'Зарезервированное количество (метры)';
+            COMMENT ON COLUMN materials.supplier IS 'Поставщик';
+            COMMENT ON COLUMN materials.supplier_contact IS 'Контактная информация поставщика';
+            COMMENT ON COLUMN materials.color IS 'Цвет материала';
+            COMMENT ON COLUMN materials.width IS 'Ширина материала';
+            COMMENT ON COLUMN materials.material IS 'Материал изготовления (атлас, шелк, бумага и т.д.)';
+            COMMENT ON COLUMN materials.notes IS 'Дополнительные примечания';
+            COMMENT ON COLUMN materials.is_active IS 'Активен ли товар';
+            COMMENT ON COLUMN materials.created_at IS 'Дата и время создания записи';
+            COMMENT ON COLUMN materials.updated_at IS 'Дата и время последнего обновления';
+        </sql>
+
+        <!-- Триггер для автоматического обновления updated_at -->
+        <sql>
+            CREATE TRIGGER update_materials_updated_at 
+                BEFORE UPDATE ON materials 
+                FOR EACH ROW 
+                EXECUTE FUNCTION update_updated_at_column();
+        </sql>
+
+        <!-- Ограничения -->
+        <addCheckConstraint tableName="materials" constraintName="chk_materials_price_positive">
+            <checkCondition>price_per_meter > 0</checkCondition>
+        </addCheckConstraint>
+
+        <addCheckConstraint tableName="materials" constraintName="chk_materials_stock_non_negative">
+            <checkCondition>stock_meters >= 0</checkCondition>
+        </addCheckConstraint>
+
+        <addCheckConstraint tableName="materials" constraintName="chk_materials_reserved_non_negative">
+            <checkCondition>reserved_meters >= 0</checkCondition>
+        </addCheckConstraint>
+
+        <addCheckConstraint tableName="materials" constraintName="chk_materials_reserved_not_exceed_stock">
+            <checkCondition>reserved_meters &lt;= stock_meters</checkCondition>
+        </addCheckConstraint>
+
+    </changeSet>
+
+</databaseChangeLog>

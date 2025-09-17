@@ -1,0 +1,254 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /inventory-service
+
+spring:
+  application:
+    name: inventory-service
+  
+  # Конфигурация базы данных PostgreSQL
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lavanda_inventory
+    username: lavanda_user
+    password: lavanda_password
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      leak-detection-threshold: 60000
+      pool-name: InventoryServiceHikariCP
+
+  # Конфигурация JPA/Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+        generate_statistics: false
+    open-in-view: false
+
+  # Конфигурация Liquibase
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+    drop-first: false
+    contexts: default
+
+  # Конфигурация Jackson для JSON
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      indent-output: true
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non_null
+    time-zone: Europe/Moscow
+
+  # Конфигурация валидации
+  validation:
+    enabled: true
+
+# Конфигурация логирования
+logging:
+  level:
+    com.omstu.lavanda.floristic: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql.BasicBinder: INFO
+    liquibase: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/inventory-service.log
+    max-size: 10MB
+    max-history: 30
+
+# Конфигурация управления и мониторинга
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,liquibase
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when_authorized
+      show-components: always
+    metrics:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+      environment: ${spring.profiles.active:default}
+
+# Информация о приложении
+info:
+  app:
+    name: LAVANDA ERP - Floristic Inventory Service
+    description: Специализированный сервис для управления флористическим инвентарем
+    version: 1.0.0
+    encoding: UTF-8
+    java:
+      version: ${java.version}
+
+# Конфигурация OpenAPI/Swagger
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+    display-operation-id: true
+  show-actuator: true
+  group-configs:
+    - group: floristic-api
+      display-name: Floristic Inventory API
+      paths-to-match: /api/floristic/**
+
+# Конфигурация пагинации
+spring.data.web.pageable:
+  default-page-size: 20
+  max-page-size: 100
+  one-indexed-parameters: false
+  page-parameter: page
+  size-parameter: size
+
+# Конфигурация CORS
+cors:
+  allowed-origins: 
+    - http://localhost:3000
+    - http://localhost:8080
+    - https://lavanda-front.vercel.app
+  allowed-methods: 
+    - GET
+    - POST
+    - PUT
+    - PATCH
+    - DELETE
+    - OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true
+  max-age: 3600
+
+# Конфигурация флористического бизнеса
+floristic:
+  # Настройки календаря свежести
+  freshness:
+    # Количество дней до истечения, когда нужна скидка
+    discount-threshold-days: 3
+    # Автоматические скидки по дням
+    auto-discounts:
+      3: 10  # 10% скидка за 3 дня до истечения
+      2: 20  # 20% скидка за 2 дня до истечения
+      1: 30  # 30% скидка за 1 день до истечения
+    # Автоматическая очистка просроченных записей (дни)
+    cleanup-expired-after-days: 30
+  
+  # Настройки склада
+  inventory:
+    # Минимальные остатки для предупреждения
+    low-stock-threshold:
+      flowers: 10  # штук
+      materials: 5.0  # метров
+    # Автоматическое обновление статусов свежести
+    auto-update-freshness: true
+    # Интервал обновления статусов (в минутах)
+    freshness-update-interval: 60
+
+# Профили для разных окружений
+---
+spring:
+  config:
+    activate:
+      on-profile: development
+  
+  # Настройки для разработки
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        generate_statistics: true
+  
+  liquibase:
+    contexts: development,default
+
+logging:
+  level:
+    com.omstu.lavanda.floristic: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+---
+spring:
+  config:
+    activate:
+      on-profile: production
+
+  # Настройки для продакшена
+  datasource:
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+  
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        generate_statistics: false
+
+logging:
+  level:
+    com.omstu.lavanda.floristic: INFO
+    org.hibernate.SQL: WARN
+  file:
+    name: /var/log/lavanda/inventory-service.log
+
+management:
+  endpoint:
+    health:
+      show-details: never
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  # Настройки для тестирования
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+  
+  liquibase:
+    enabled: false
+
+logging:
+  level:
+    com.omstu.lavanda.floristic: DEBUG

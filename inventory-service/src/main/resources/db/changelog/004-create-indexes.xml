@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="004-create-indexes" author="lavanda-system">
+        <comment>Создание индексов для оптимизации запросов флористического учета</comment>
+
+        <!-- Индексы для таблицы flowers -->
+        <createIndex tableName="flowers" indexName="idx_flowers_name">
+            <column name="name"/>
+        </createIndex>
+
+        <createIndex tableName="flowers" indexName="idx_flowers_type">
+            <column name="type"/>
+        </createIndex>
+
+        <createIndex tableName="flowers" indexName="idx_flowers_color">
+            <column name="color"/>
+        </createIndex>
+
+        <createIndex tableName="flowers" indexName="idx_flowers_supplier">
+            <column name="supplier"/>
+        </createIndex>
+
+        <createIndex tableName="flowers" indexName="idx_flowers_seasonal_availability">
+            <column name="seasonal_availability"/>
+        </createIndex>
+
+        <createIndex tableName="flowers" indexName="idx_flowers_expiry_date">
+            <column name="expiry_date"/>
+        </createIndex>
+
+        <createIndex tableName="flowers" indexName="idx_flowers_is_active">
+            <column name="is_active"/>
+        </createIndex>
+
+        <createIndex tableName="flowers" indexName="idx_flowers_stock_quantity">
+            <column name="stock_quantity"/>
+        </createIndex>
+
+        <createIndex tableName="flowers" indexName="idx_flowers_created_at">
+            <column name="created_at"/>
+        </createIndex>
+
+        <!-- Составные индексы для flowers -->
+        <createIndex tableName="flowers" indexName="idx_flowers_type_color">
+            <column name="type"/>
+            <column name="color"/>
+        </createIndex>
+
+        <createIndex tableName="flowers" indexName="idx_flowers_active_stock">
+            <column name="is_active"/>
+            <column name="stock_quantity"/>
+        </createIndex>
+
+        <!-- Индексы для таблицы materials -->
+        <createIndex tableName="materials" indexName="idx_materials_name">
+            <column name="name"/>
+        </createIndex>
+
+        <createIndex tableName="materials" indexName="idx_materials_type">
+            <column name="type"/>
+        </createIndex>
+
+        <createIndex tableName="materials" indexName="idx_materials_supplier">
+            <column name="supplier"/>
+        </createIndex>
+
+        <createIndex tableName="materials" indexName="idx_materials_color">
+            <column name="color"/>
+        </createIndex>
+
+        <createIndex tableName="materials" indexName="idx_materials_width">
+            <column name="width"/>
+        </createIndex>
+
+        <createIndex tableName="materials" indexName="idx_materials_is_active">
+            <column name="is_active"/>
+        </createIndex>
+
+        <createIndex tableName="materials" indexName="idx_materials_stock_meters">
+            <column name="stock_meters"/>
+        </createIndex>
+
+        <createIndex tableName="materials" indexName="idx_materials_created_at">
+            <column name="created_at"/>
+        </createIndex>
+
+        <!-- Составные индексы для materials -->
+        <createIndex tableName="materials" indexName="idx_materials_type_color">
+            <column name="type"/>
+            <column name="color"/>
+        </createIndex>
+
+        <createIndex tableName="materials" indexName="idx_materials_active_stock">
+            <column name="is_active"/>
+            <column name="stock_meters"/>
+        </createIndex>
+
+        <!-- Индексы для таблицы freshness_calendar -->
+        <createIndex tableName="freshness_calendar" indexName="idx_freshness_flower_id">
+            <column name="flower_id"/>
+        </createIndex>
+
+        <createIndex tableName="freshness_calendar" indexName="idx_freshness_batch_number">
+            <column name="batch_number"/>
+        </createIndex>
+
+        <createIndex tableName="freshness_calendar" indexName="idx_freshness_delivery_date">
+            <column name="delivery_date"/>
+        </createIndex>
+
+        <createIndex tableName="freshness_calendar" indexName="idx_freshness_expiry_date">
+            <column name="expiry_date"/>
+        </createIndex>
+
+        <createIndex tableName="freshness_calendar" indexName="idx_freshness_status">
+            <column name="freshness_status"/>
+        </createIndex>
+
+        <createIndex tableName="freshness_calendar" indexName="idx_freshness_is_sold">
+            <column name="is_sold"/>
+        </createIndex>
+
+        <createIndex tableName="freshness_calendar" indexName="idx_freshness_sold_date">
+            <column name="sold_date"/>
+        </createIndex>
+
+        <createIndex tableName="freshness_calendar" indexName="idx_freshness_discount_percentage">
+            <column name="discount_percentage"/>
+        </createIndex>
+
+        <createIndex tableName="freshness_calendar" indexName="idx_freshness_created_at">
+            <column name="created_at"/>
+        </createIndex>
+
+        <!-- Составные индексы для freshness_calendar -->
+        <createIndex tableName="freshness_calendar" indexName="idx_freshness_flower_status">
+            <column name="flower_id"/>
+            <column name="freshness_status"/>
+        </createIndex>
+
+        <createIndex tableName="freshness_calendar" indexName="idx_freshness_expiry_sold">
+            <column name="expiry_date"/>
+            <column name="is_sold"/>
+        </createIndex>
+
+        <createIndex tableName="freshness_calendar" indexName="idx_freshness_batch_sold">
+            <column name="batch_number"/>
+            <column name="is_sold"/>
+        </createIndex>
+
+        <!-- Индекс для поиска истекающих записей -->
+        <createIndex tableName="freshness_calendar" indexName="idx_freshness_expiring_soon">
+            <column name="expiry_date"/>
+            <column name="is_sold"/>
+            <column name="freshness_status"/>
+        </createIndex>
+
+        <!-- Индекс для поиска записей, требующих скидки -->
+        <createIndex tableName="freshness_calendar" indexName="idx_freshness_needing_discount">
+            <column name="freshness_status"/>
+            <column name="discount_percentage"/>
+            <column name="is_sold"/>
+        </createIndex>
+
+        <!-- Уникальные индексы -->
+        <createIndex tableName="flowers" indexName="idx_flowers_name_supplier_unique" unique="true">
+            <column name="name"/>
+            <column name="supplier"/>
+            <column name="type"/>
+            <column name="color"/>
+        </createIndex>
+
+        <createIndex tableName="materials" indexName="idx_materials_name_supplier_unique" unique="true">
+            <column name="name"/>
+            <column name="supplier"/>
+            <column name="type"/>
+        </createIndex>
+
+        <!-- Частичные индексы для активных записей -->
+        <sql>
+            CREATE INDEX idx_flowers_active_only ON flowers (name, type, color) WHERE is_active = true;
+            CREATE INDEX idx_materials_active_only ON materials (name, type) WHERE is_active = true;
+            CREATE INDEX idx_freshness_unsold_only ON freshness_calendar (flower_id, expiry_date, freshness_status) WHERE is_sold = false;
+        </sql>
+
+    </changeSet>
+
+</databaseChangeLog>

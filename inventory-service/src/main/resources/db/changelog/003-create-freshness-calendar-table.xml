@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="003-create-freshness-calendar-table" author="lavanda-system">
+        <comment>Создание таблицы календаря свежести для флористического учета</comment>
+        
+        <createTable tableName="freshness_calendar">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="flower_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="batch_number" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="quantity" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="delivery_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="expiry_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="freshness_status" type="VARCHAR(50)" defaultValue="FRESH">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="storage_conditions" type="VARCHAR(200)"/>
+            
+            <column name="temperature_celsius" type="INTEGER"/>
+            
+            <column name="humidity_percentage" type="INTEGER"/>
+            
+            <column name="discount_percentage" type="INTEGER" defaultValue="0"/>
+            
+            <column name="is_sold" type="BOOLEAN" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="sold_date" type="DATE"/>
+            
+            <column name="notes" type="TEXT"/>
+            
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Внешний ключ на таблицу цветов -->
+        <addForeignKeyConstraint 
+            baseTableName="freshness_calendar" 
+            baseColumnNames="flower_id"
+            constraintName="fk_freshness_calendar_flower"
+            referencedTableName="flowers"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <!-- Комментарии к таблице и колонкам -->
+        <sql>
+            COMMENT ON TABLE freshness_calendar IS 'Календарь свежести цветов для флористического учета LAVANDA ERP';
+            COMMENT ON COLUMN freshness_calendar.id IS 'Уникальный идентификатор записи календаря';
+            COMMENT ON COLUMN freshness_calendar.flower_id IS 'Ссылка на цветок';
+            COMMENT ON COLUMN freshness_calendar.batch_number IS 'Номер партии поставки';
+            COMMENT ON COLUMN freshness_calendar.quantity IS 'Количество цветов в партии (штуки)';
+            COMMENT ON COLUMN freshness_calendar.delivery_date IS 'Дата поступления партии';
+            COMMENT ON COLUMN freshness_calendar.expiry_date IS 'Дата истечения срока годности';
+            COMMENT ON COLUMN freshness_calendar.freshness_status IS 'Статус свежести (FRESH, GOOD, FAIR, POOR, EXPIRED)';
+            COMMENT ON COLUMN freshness_calendar.storage_conditions IS 'Условия хранения';
+            COMMENT ON COLUMN freshness_calendar.temperature_celsius IS 'Температура хранения в градусах Цельсия';
+            COMMENT ON COLUMN freshness_calendar.humidity_percentage IS 'Влажность в процентах';
+            COMMENT ON COLUMN freshness_calendar.discount_percentage IS 'Процент скидки';
+            COMMENT ON COLUMN freshness_calendar.is_sold IS 'Продана ли партия';
+            COMMENT ON COLUMN freshness_calendar.sold_date IS 'Дата продажи';
+            COMMENT ON COLUMN freshness_calendar.notes IS 'Дополнительные примечания';
+            COMMENT ON COLUMN freshness_calendar.created_at IS 'Дата и время создания записи';
+            COMMENT ON COLUMN freshness_calendar.updated_at IS 'Дата и время последнего обновления';
+        </sql>
+
+        <!-- Триггер для автоматического обновления updated_at -->
+        <sql>
+            CREATE TRIGGER update_freshness_calendar_updated_at 
+                BEFORE UPDATE ON freshness_calendar 
+                FOR EACH ROW 
+                EXECUTE FUNCTION update_updated_at_column();
+        </sql>
+
+        <!-- Ограничения -->
+        <addCheckConstraint tableName="freshness_calendar" constraintName="chk_freshness_quantity_positive">
+            <checkCondition>quantity > 0</checkCondition>
+        </addCheckConstraint>
+
+        <addCheckConstraint tableName="freshness_calendar" constraintName="chk_freshness_expiry_after_delivery">
+            <checkCondition>expiry_date >= delivery_date</checkCondition>
+        </addCheckConstraint>
+
+        <addCheckConstraint tableName="freshness_calendar" constraintName="chk_freshness_discount_valid">
+            <checkCondition>discount_percentage >= 0 AND discount_percentage <= 100</checkCondition>
+        </addCheckConstraint>
+
+        <addCheckConstraint tableName="freshness_calendar" constraintName="chk_freshness_temperature_valid">
+            <checkCondition>temperature_celsius IS NULL OR (temperature_celsius >= -20 AND temperature_celsius <= 50)</checkCondition>
+        </addCheckConstraint>
+
+        <addCheckConstraint tableName="freshness_calendar" constraintName="chk_freshness_humidity_valid">
+            <checkCondition>humidity_percentage IS NULL OR (humidity_percentage >= 0 AND humidity_percentage <= 100)</checkCondition>
+        </addCheckConstraint>
+
+        <addCheckConstraint tableName="freshness_calendar" constraintName="chk_freshness_sold_date_valid">
+            <checkCondition>sold_date IS NULL OR (is_sold = true AND sold_date >= delivery_date)</checkCondition>
+        </addCheckConstraint>
+
+    </changeSet>
+
+</databaseChangeLog>

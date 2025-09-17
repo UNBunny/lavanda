@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-create-flowers-table" author="lavanda-system">
+        <comment>Создание таблицы цветов для флористического учета</comment>
+        
+        <createTable tableName="flowers">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="color" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="description" type="TEXT"/>
+            
+            <column name="price_per_piece" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="stock_quantity" type="INTEGER" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="reserved_quantity" type="INTEGER" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="supplier" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="supplier_contact" type="VARCHAR(100)"/>
+            
+            <column name="expiry_date" type="DATE"/>
+            
+            <column name="seasonal_availability" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="storage_conditions" type="VARCHAR(200)"/>
+            
+            <column name="notes" type="TEXT"/>
+            
+            <column name="is_active" type="BOOLEAN" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Комментарии к таблице и колонкам -->
+        <sql>
+            COMMENT ON TABLE flowers IS 'Таблица цветов для флористического учета LAVANDA ERP';
+            COMMENT ON COLUMN flowers.id IS 'Уникальный идентификатор цветка';
+            COMMENT ON COLUMN flowers.name IS 'Название цветка';
+            COMMENT ON COLUMN flowers.type IS 'Тип цветка (ROSE, TULIP, LILY и т.д.)';
+            COMMENT ON COLUMN flowers.color IS 'Цвет цветка (RED, WHITE, PINK и т.д.)';
+            COMMENT ON COLUMN flowers.description IS 'Описание цветка';
+            COMMENT ON COLUMN flowers.price_per_piece IS 'Цена за штуку в рублях';
+            COMMENT ON COLUMN flowers.stock_quantity IS 'Количество на складе (штуки)';
+            COMMENT ON COLUMN flowers.reserved_quantity IS 'Зарезервированное количество (штуки)';
+            COMMENT ON COLUMN flowers.supplier IS 'Поставщик';
+            COMMENT ON COLUMN flowers.supplier_contact IS 'Контактная информация поставщика';
+            COMMENT ON COLUMN flowers.expiry_date IS 'Дата истечения срока годности';
+            COMMENT ON COLUMN flowers.seasonal_availability IS 'Сезонная доступность (ALL_YEAR, SPRING, SUMMER и т.д.)';
+            COMMENT ON COLUMN flowers.storage_conditions IS 'Условия хранения';
+            COMMENT ON COLUMN flowers.notes IS 'Дополнительные примечания';
+            COMMENT ON COLUMN flowers.is_active IS 'Активен ли товар';
+            COMMENT ON COLUMN flowers.created_at IS 'Дата и время создания записи';
+            COMMENT ON COLUMN flowers.updated_at IS 'Дата и время последнего обновления';
+        </sql>
+
+        <!-- Триггер для автоматического обновления updated_at -->
+        <sql>
+            CREATE OR REPLACE FUNCTION update_updated_at_column()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.updated_at = CURRENT_TIMESTAMP;
+                RETURN NEW;
+            END;
+            $$ language 'plpgsql';
+
+            CREATE TRIGGER update_flowers_updated_at 
+                BEFORE UPDATE ON flowers 
+                FOR EACH ROW 
+                EXECUTE FUNCTION update_updated_at_column();
+        </sql>
+
+        <!-- Ограничения -->
+        <addCheckConstraint tableName="flowers" constraintName="chk_flowers_price_positive">
+            <checkCondition>price_per_piece > 0</checkCondition>
+        </addCheckConstraint>
+
+        <addCheckConstraint tableName="flowers" constraintName="chk_flowers_stock_non_negative">
+            <checkCondition>stock_quantity >= 0</checkCondition>
+        </addCheckConstraint>
+
+        <addCheckConstraint tableName="flowers" constraintName="chk_flowers_reserved_non_negative">
+            <checkCondition>reserved_quantity >= 0</checkCondition>
+        </addCheckConstraint>
+
+        <addCheckConstraint tableName="flowers" constraintName="chk_flowers_reserved_not_exceed_stock">
+            <checkCondition>reserved_quantity &lt;= stock_quantity</checkCondition>
+        </addCheckConstraint>
+
+    </changeSet>
+
+</databaseChangeLog>
