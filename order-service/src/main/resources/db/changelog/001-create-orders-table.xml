@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="001-create-orders-table" author="lavanda-dev">
+        <comment>Создание таблицы заказов для LAVANDA ERP</comment>
+        
+        <createTable tableName="orders">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="order_number" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="customer_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="customer_phone" type="VARCHAR(20)"/>
+            
+            <column name="customer_email" type="VARCHAR(100)"/>
+            
+            <column name="delivery_address" type="TEXT"/>
+            
+            <column name="delivery_date" type="TIMESTAMP"/>
+            
+            <column name="total_amount" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="discount_amount" type="DECIMAL(10,2)" defaultValue="0.00">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="final_amount" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="notes" type="TEXT"/>
+            
+            <column name="payment_method" type="VARCHAR(50)"/>
+            
+            <column name="payment_status" type="VARCHAR(20)"/>
+            
+            <column name="assigned_florist_id" type="BIGINT"/>
+            
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <!-- Добавляем комментарии к таблице и колонкам -->
+        <sql>
+            COMMENT ON TABLE orders IS 'Таблица заказов в цветочной мастерской LAVANDA';
+            COMMENT ON COLUMN orders.id IS 'Уникальный идентификатор заказа';
+            COMMENT ON COLUMN orders.order_number IS 'Номер заказа для клиентов';
+            COMMENT ON COLUMN orders.status IS 'Статус заказа (NEW, CONFIRMED, IN_PROGRESS, READY, OUT_FOR_DELIVERY, DELIVERED, CANCELLED, RETURNED)';
+            COMMENT ON COLUMN orders.customer_name IS 'Имя клиента';
+            COMMENT ON COLUMN orders.customer_phone IS 'Телефон клиента';
+            COMMENT ON COLUMN orders.customer_email IS 'Email клиента';
+            COMMENT ON COLUMN orders.delivery_address IS 'Адрес доставки';
+            COMMENT ON COLUMN orders.delivery_date IS 'Желаемая дата и время доставки';
+            COMMENT ON COLUMN orders.total_amount IS 'Общая стоимость заказа';
+            COMMENT ON COLUMN orders.discount_amount IS 'Размер скидки';
+            COMMENT ON COLUMN orders.final_amount IS 'Итоговая стоимость с учетом скидки';
+            COMMENT ON COLUMN orders.notes IS 'Комментарий к заказу';
+            COMMENT ON COLUMN orders.payment_method IS 'Способ оплаты';
+            COMMENT ON COLUMN orders.payment_status IS 'Статус оплаты';
+            COMMENT ON COLUMN orders.assigned_florist_id IS 'ID назначенного флориста';
+            COMMENT ON COLUMN orders.created_at IS 'Дата создания заказа';
+            COMMENT ON COLUMN orders.updated_at IS 'Дата последнего обновления заказа';
+        </sql>
+        
+        <!-- Создаем триггер для автоматического обновления updated_at -->
+        <sql>
+            CREATE OR REPLACE FUNCTION update_updated_at_column()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.updated_at = CURRENT_TIMESTAMP;
+                RETURN NEW;
+            END$$
+            LANGUAGE plpgsql;
+            
+            CREATE TRIGGER update_orders_updated_at 
+                BEFORE UPDATE ON orders 
+                FOR EACH ROW 
+                EXECUTE FUNCTION update_updated_at_column();
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="004-insert-sample-data" author="lavanda-dev" context="dev">
+        <comment>Вставка тестовых данных для разработки Order Management Service</comment>
+        
+        <!-- Тестовые заказы -->
+        <insert tableName="orders">
+            <column name="id" value="1"/>
+            <column name="order_number" value="LV-20240917-0001"/>
+            <column name="status" value="NEW"/>
+            <column name="customer_name" value="Анна Петрова"/>
+            <column name="customer_phone" value="+79991234567"/>
+            <column name="customer_email" value="anna.petrova@email.com"/>
+            <column name="delivery_address" value="г. Омск, ул. Ленина, д. 12, кв. 45"/>
+            <column name="delivery_date" valueDate="2024-09-18T14:00:00"/>
+            <column name="total_amount" value="4500.00"/>
+            <column name="discount_amount" value="0.00"/>
+            <column name="final_amount" value="4500.00"/>
+            <column name="notes" value="Букет из 25 красных роз для дня рождения"/>
+            <column name="payment_method" value="CARD"/>
+            <column name="payment_status" value="PENDING"/>
+            <column name="created_at" valueDate="2024-09-17T10:30:00"/>
+            <column name="updated_at" valueDate="2024-09-17T10:30:00"/>
+        </insert>
+        
+        <insert tableName="orders">
+            <column name="id" value="2"/>
+            <column name="order_number" value="LV-20240917-0002"/>
+            <column name="status" value="IN_PROGRESS"/>
+            <column name="customer_name" value="Михаил Иванов"/>
+            <column name="customer_phone" value="+79991234568"/>
+            <column name="customer_email" value="mikhail.ivanov@email.com"/>
+            <column name="delivery_address" value="г. Омск, пр. Мира, д. 25"/>
+            <column name="delivery_date" valueDate="2024-09-17T16:00:00"/>
+            <column name="total_amount" value="3200.00"/>
+            <column name="discount_amount" value="200.00"/>
+            <column name="final_amount" value="3000.00"/>
+            <column name="notes" value="Композиция с белыми лилиями"/>
+            <column name="payment_method" value="CASH"/>
+            <column name="payment_status" value="PAID"/>
+            <column name="assigned_florist_id" value="1"/>
+            <column name="created_at" valueDate="2024-09-17T09:15:00"/>
+            <column name="updated_at" valueDate="2024-09-17T11:00:00"/>
+        </insert>
+        
+        <insert tableName="orders">
+            <column name="id" value="3"/>
+            <column name="order_number" value="LV-20240916-0001"/>
+            <column name="status" value="DELIVERED"/>
+            <column name="customer_name" value="Елена Сидорова"/>
+            <column name="customer_phone" value="+79991234569"/>
+            <column name="customer_email" value="elena.sidorova@email.com"/>
+            <column name="delivery_address" value="г. Омск, ул. Красный Путь, д. 88"/>
+            <column name="delivery_date" valueDate="2024-09-16T18:00:00"/>
+            <column name="total_amount" value="8900.00"/>
+            <column name="discount_amount" value="0.00"/>
+            <column name="final_amount" value="8900.00"/>
+            <column name="notes" value="Свадебный букет из пионов и роз"/>
+            <column name="payment_method" value="TRANSFER"/>
+            <column name="payment_status" value="PAID"/>
+            <column name="assigned_florist_id" value="2"/>
+            <column name="created_at" valueDate="2024-09-16T14:20:00"/>
+            <column name="updated_at" valueDate="2024-09-16T19:30:00"/>
+        </insert>
+        
+        <insert tableName="orders">
+            <column name="id" value="4"/>
+            <column name="order_number" value="LV-20240916-0002"/>
+            <column name="status" value="READY"/>
+            <column name="customer_name" value="Дмитрий Козлов"/>
+            <column name="customer_phone" value="+79991234570"/>
+            <column name="delivery_address" value="г. Омск, ул. Герцена, д. 15"/>
+            <column name="delivery_date" valueDate="2024-09-17T12:00:00"/>
+            <column name="total_amount" value="2100.00"/>
+            <column name="discount_amount" value="100.00"/>
+            <column name="final_amount" value="2000.00"/>
+            <column name="notes" value="Букет желтых тюльпанов"/>
+            <column name="payment_method" value="CARD"/>
+            <column name="payment_status" value="PAID"/>
+            <column name="assigned_florist_id" value="1"/>
+            <column name="created_at" valueDate="2024-09-16T16:45:00"/>
+            <column name="updated_at" valueDate="2024-09-17T11:30:00"/>
+        </insert>
+        
+        <!-- Позиции для первого заказа (Букет из 25 роз) -->
+        <insert tableName="order_items">
+            <column name="order_id" value="1"/>
+            <column name="product_id" value="101"/>
+            <column name="product_name" value="Роза красная"/>
+            <column name="product_sku" value="ROSE-RED-001"/>
+            <column name="product_type" value="FLOWER"/>
+            <column name="quantity" value="25"/>
+            <column name="unit_of_measure" value="шт"/>
+            <column name="unit_price" value="150.00"/>
+            <column name="total_price" value="3750.00"/>
+            <column name="discount_amount" value="0.00"/>
+        </insert>
+        
+        <insert tableName="order_items">
+            <column name="order_id" value="1"/>
+            <column name="product_id" value="201"/>
+            <column name="product_name" value="Упаковка праздничная"/>
+            <column name="product_sku" value="WRAP-FEST-001"/>
+            <column name="product_type" value="PACKAGING"/>
+            <column name="quantity" value="1"/>
+            <column name="unit_of_measure" value="шт"/>
+            <column name="unit_price" value="500.00"/>
+            <column name="total_price" value="500.00"/>
+            <column name="discount_amount" value="0.00"/>
+        </insert>
+        
+        <insert tableName="order_items">
+            <column name="order_id" value="1"/>
+            <column name="product_id" value="301"/>
+            <column name="product_name" value="Лента атласная красная"/>
+            <column name="product_sku" value="RIBBON-RED-001"/>
+            <column name="product_type" value="MATERIAL"/>
+            <column name="quantity" value="2"/>
+            <column name="unit_of_measure" value="м"/>
+            <column name="unit_price" value="125.00"/>
+            <column name="total_price" value="250.00"/>
+            <column name="discount_amount" value="0.00"/>
+        </insert>
+        
+        <!-- Позиции для второго заказа (Композиция с лилиями) -->
+        <insert tableName="order_items">
+            <column name="order_id" value="2"/>
+            <column name="product_id" value="102"/>
+            <column name="product_name" value="Лилия белая"/>
+            <column name="product_sku" value="LILY-WHITE-001"/>
+            <column name="product_type" value="FLOWER"/>
+            <column name="quantity" value="7"/>
+            <column name="unit_of_measure" value="шт"/>
+            <column name="unit_price" value="200.00"/>
+            <column name="total_price" value="1400.00"/>
+            <column name="discount_amount" value="0.00"/>
+        </insert>
+        
+        <insert tableName="order_items">
+            <column name="order_id" value="2"/>
+            <column name="product_id" value="103"/>
+            <column name="product_name" value="Зелень декоративная"/>
+            <column name="product_sku" value="GREEN-DEC-001"/>
+            <column name="product_type" value="GREENERY"/>
+            <column name="quantity" value="5"/>
+            <column name="unit_of_measure" value="шт"/>
+            <column name="unit_price" value="80.00"/>
+            <column name="total_price" value="400.00"/>
+            <column name="discount_amount" value="0.00"/>
+        </insert>
+        
+        <insert tableName="order_items">
+            <column name="order_id" value="2"/>
+            <column name="product_id" value="202"/>
+            <column name="product_name" value="Корзина плетеная"/>
+            <column name="product_sku" value="BASKET-001"/>
+            <column name="product_type" value="CONTAINER"/>
+            <column name="quantity" value="1"/>
+            <column name="unit_of_measure" value="шт"/>
+            <column name="unit_price" value="1400.00"/>
+            <column name="total_price" value="1400.00"/>
+            <column name="discount_amount" value="200.00"/>
+        </insert>
+        
+        <!-- Позиции для третьего заказа (Свадебный букет) -->
+        <insert tableName="order_items">
+            <column name="order_id" value="3"/>
+            <column name="product_id" value="104"/>
+            <column name="product_name" value="Пион розовый"/>
+            <column name="product_sku" value="PEONY-PINK-001"/>
+            <column name="product_type" value="FLOWER"/>
+            <column name="quantity" value="15"/>
+            <column name="unit_of_measure" value="шт"/>
+            <column name="unit_price" value="350.00"/>
+            <column name="total_price" value="5250.00"/>
+            <column name="discount_amount" value="0.00"/>
+            <column name="is_bouquet_component" value="true"/>
+            <column name="parent_bouquet_id" value="1001"/>
+        </insert>
+        
+        <insert tableName="order_items">
+            <column name="order_id" value="3"/>
+            <column name="product_id" value="105"/>
+            <column name="product_name" value="Роза белая"/>
+            <column name="product_sku" value="ROSE-WHITE-001"/>
+            <column name="product_type" value="FLOWER"/>
+            <column name="quantity" value="10"/>
+            <column name="unit_of_measure" value="шт"/>
+            <column name="unit_price" value="180.00"/>
+            <column name="total_price" value="1800.00"/>
+            <column name="discount_amount" value="0.00"/>
+            <column name="is_bouquet_component" value="true"/>
+            <column name="parent_bouquet_id" value="1001"/>
+        </insert>
+        
+        <insert tableName="order_items">
+            <column name="order_id" value="3"/>
+            <column name="product_id" value="302"/>
+            <column name="product_name" value="Лента атласная белая"/>
+            <column name="product_sku" value="RIBBON-WHITE-001"/>
+            <column name="product_type" value="MATERIAL"/>
+            <column name="quantity" value="3"/>
+            <column name="unit_of_measure" value="м"/>
+            <column name="unit_price" value="120.00"/>
+            <column name="total_price" value="360.00"/>
+            <column name="discount_amount" value="0.00"/>
+        </insert>
+        
+        <insert tableName="order_items">
+            <column name="order_id" value="3"/>
+            <column name="product_id" value="203"/>
+            <column name="product_name" value="Упаковка свадебная премиум"/>
+            <column name="product_sku" value="WRAP-WEDDING-001"/>
+            <column name="product_type" value="PACKAGING"/>
+            <column name="quantity" value="1"/>
+            <column name="unit_of_measure" value="шт"/>
+            <column name="unit_price" value="1490.00"/>
+            <column name="total_price" value="1490.00"/>
+            <column name="discount_amount" value="0.00"/>
+        </insert>
+        
+        <!-- Позиции для четвертого заказа (Букет тюльпанов) -->
+        <insert tableName="order_items">
+            <column name="order_id" value="4"/>
+            <column name="product_id" value="106"/>
+            <column name="product_name" value="Тюльпан желтый"/>
+            <column name="product_sku" value="TULIP-YELLOW-001"/>
+            <column name="product_type" value="FLOWER"/>
+            <column name="quantity" value="15"/>
+            <column name="unit_of_measure" value="шт"/>
+            <column name="unit_price" value="90.00"/>
+            <column name="total_price" value="1350.00"/>
+            <column name="discount_amount" value="0.00"/>
+        </insert>
+        
+        <insert tableName="order_items">
+            <column name="order_id" value="4"/>
+            <column name="product_id" value="204"/>
+            <column name="product_name" value="Упаковка крафт"/>
+            <column name="product_sku" value="WRAP-KRAFT-001"/>
+            <column name="product_type" value="PACKAGING"/>
+            <column name="quantity" value="1"/>
+            <column name="unit_of_measure" value="шт"/>
+            <column name="unit_price" value="250.00"/>
+            <column name="total_price" value="150.00"/>
+            <column name="discount_amount" value="100.00"/>
+        </insert>
+        
+        <insert tableName="order_items">
+            <column name="order_id" value="4"/>
+            <column name="product_id" value="303"/>
+            <column name="product_name" value="Лента джутовая"/>
+            <column name="product_sku" value="RIBBON-JUTE-001"/>
+            <column name="product_type" value="MATERIAL"/>
+            <column name="quantity" value="1.5"/>
+            <column name="unit_of_measure" value="м"/>
+            <column name="unit_price" value="100.00"/>
+            <column name="total_price" value="150.00"/>
+            <column name="discount_amount" value="0.00"/>
+        </insert>
+        
+        <!-- Обновляем последовательности для автоинкремента -->
+        <sql>
+            SELECT setval('orders_id_seq', 4, true);
+            SELECT setval('order_items_id_seq', 12, true);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

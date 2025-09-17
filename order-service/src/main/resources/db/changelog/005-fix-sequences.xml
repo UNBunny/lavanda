@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- Исправление последовательностей после вставки тестовых данных -->
+    <changeSet id="005-fix-sequences" author="lavanda-dev">
+        <comment>Синхронизация последовательностей с максимальными ID в таблицах</comment>
+        
+        <!-- Синхронизация последовательности orders -->
+        <sql>
+            SELECT setval('orders_id_seq', COALESCE((SELECT MAX(id) FROM orders), 1), true);
+        </sql>
+        
+        <!-- Синхронизация последовательности order_items -->
+        <sql>
+            SELECT setval('order_items_id_seq', COALESCE((SELECT MAX(id) FROM order_items), 1), true);
+        </sql>
+        
+        <rollback>
+            <!-- В случае отката сбрасываем последовательности на 1 -->
+            <sql>SELECT setval('orders_id_seq', 1, false);</sql>
+            <sql>SELECT setval('order_items_id_seq', 1, false);</sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

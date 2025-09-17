@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="002-create-order-items-table" author="lavanda-dev">
+        <comment>Создание таблицы позиций заказов для LAVANDA ERP</comment>
+        
+        <createTable tableName="order_items">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="order_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="product_name" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="product_sku" type="VARCHAR(100)"/>
+            
+            <column name="product_type" type="VARCHAR(50)"/>
+            
+            <column name="quantity" type="DECIMAL(10,3)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="unit_of_measure" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="unit_price" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="total_price" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="discount_amount" type="DECIMAL(10,2)" defaultValue="0.00">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="notes" type="VARCHAR(500)"/>
+            
+            <column name="is_bouquet_component" type="BOOLEAN" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="parent_bouquet_id" type="BIGINT"/>
+        </createTable>
+        
+        <!-- Создаем внешний ключ для связи с таблицей заказов -->
+        <addForeignKeyConstraint
+                baseTableName="order_items"
+                baseColumnNames="order_id"
+                constraintName="fk_order_items_order_id"
+                referencedTableName="orders"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+        
+        <!-- Добавляем комментарии к таблице и колонкам -->
+        <sql>
+            COMMENT ON TABLE order_items IS 'Таблица позиций заказов в цветочной мастерской LAVANDA';
+            COMMENT ON COLUMN order_items.id IS 'Уникальный идентификатор позиции заказа';
+            COMMENT ON COLUMN order_items.order_id IS 'ID заказа, к которому относится позиция';
+            COMMENT ON COLUMN order_items.product_id IS 'ID товара из каталога';
+            COMMENT ON COLUMN order_items.product_name IS 'Название товара (сохраняется для истории)';
+            COMMENT ON COLUMN order_items.product_sku IS 'Артикул товара';
+            COMMENT ON COLUMN order_items.product_type IS 'Тип товара (цветок, материал, готовый букет, композиция)';
+            COMMENT ON COLUMN order_items.quantity IS 'Количество товара';
+            COMMENT ON COLUMN order_items.unit_of_measure IS 'Единица измерения (шт, м, кг и т.д.)';
+            COMMENT ON COLUMN order_items.unit_price IS 'Цена за единицу товара на момент заказа';
+            COMMENT ON COLUMN order_items.total_price IS 'Общая стоимость позиции';
+            COMMENT ON COLUMN order_items.discount_amount IS 'Скидка на позицию';
+            COMMENT ON COLUMN order_items.notes IS 'Комментарий к позиции';
+            COMMENT ON COLUMN order_items.is_bouquet_component IS 'Является ли товар частью букета/композиции';
+            COMMENT ON COLUMN order_items.parent_bouquet_id IS 'ID родительского букета/композиции';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

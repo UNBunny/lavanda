@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="003-create-indexes" author="lavanda-dev">
+        <comment>Создание индексов для оптимизации запросов в Order Management Service</comment>
+        
+        <!-- Индексы для таблицы orders -->
+        <createIndex indexName="idx_orders_order_number" tableName="orders">
+            <column name="order_number"/>
+        </createIndex>
+        
+        <createIndex indexName="idx_orders_status" tableName="orders">
+            <column name="status"/>
+        </createIndex>
+        
+        <createIndex indexName="idx_orders_customer_phone" tableName="orders">
+            <column name="customer_phone"/>
+        </createIndex>
+        
+        <createIndex indexName="idx_orders_customer_email" tableName="orders">
+            <column name="customer_email"/>
+        </createIndex>
+        
+        <createIndex indexName="idx_orders_assigned_florist_id" tableName="orders">
+            <column name="assigned_florist_id"/>
+        </createIndex>
+        
+        <createIndex indexName="idx_orders_created_at" tableName="orders">
+            <column name="created_at"/>
+        </createIndex>
+        
+        <createIndex indexName="idx_orders_delivery_date" tableName="orders">
+            <column name="delivery_date"/>
+        </createIndex>
+        
+        <!-- Составные индексы для часто используемых запросов -->
+        <createIndex indexName="idx_orders_status_created_at" tableName="orders">
+            <column name="status"/>
+            <column name="created_at"/>
+        </createIndex>
+        
+        <createIndex indexName="idx_orders_status_florist" tableName="orders">
+            <column name="status"/>
+            <column name="assigned_florist_id"/>
+        </createIndex>
+        
+        <!-- Индексы для таблицы order_items -->
+        <createIndex indexName="idx_order_items_order_id" tableName="order_items">
+            <column name="order_id"/>
+        </createIndex>
+        
+        <createIndex indexName="idx_order_items_product_id" tableName="order_items">
+            <column name="product_id"/>
+        </createIndex>
+        
+        <createIndex indexName="idx_order_items_product_type" tableName="order_items">
+            <column name="product_type"/>
+        </createIndex>
+        
+        <createIndex indexName="idx_order_items_parent_bouquet_id" tableName="order_items">
+            <column name="parent_bouquet_id"/>
+        </createIndex>
+        
+        <createIndex indexName="idx_order_items_is_bouquet_component" tableName="order_items">
+            <column name="is_bouquet_component"/>
+        </createIndex>
+        
+        <!-- Составной индекс для поиска компонентов букета -->
+        <createIndex indexName="idx_order_items_bouquet_components" tableName="order_items">
+            <column name="is_bouquet_component"/>
+            <column name="parent_bouquet_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

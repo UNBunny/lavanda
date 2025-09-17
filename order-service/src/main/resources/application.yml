@@ -1,0 +1,105 @@
+spring:
+  application:
+    name: order-service
+  
+  # Конфигурация базы данных
+  datasource:
+    url: jdbc:postgresql://localhost:5433/lavanda_orders
+    username: ${DB_USERNAME:lavanda_user}
+    password: ${DB_PASSWORD:lavanda_password}
+    driver-class-name: org.postgresql.Driver
+    
+  # Настройки JPA и Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+        
+  # Настройки Liquibase
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+    
+  # Настройки Jackson для JSON
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: Asia/Omsk
+    
+# Настройки сервера
+server:
+  port: 8081
+  servlet:
+    context-path: /order-service
+    
+# Настройки логирования
+logging:
+  level:
+    com.omstu.lavanda.order: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/order-service.log
+    
+# Настройки управления и мониторинга
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+      
+# Информация о приложении
+info:
+  app:
+    name: LAVANDA Order Management Service
+    description: Микросервис управления заказами для цветочной мастерской LAVANDA
+    version: 1.0.0
+    encoding: UTF-8
+    java:
+      version: 21
+      
+# Настройки OpenAPI/Swagger
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  info:
+    title: LAVANDA Order Management API
+    description: REST API для управления заказами в цветочной мастерской LAVANDA
+    version: 1.0.0
+    contact:
+      name: LAVANDA Development Team
+      email: dev@lavanda.ru
+      
+# Настройки валидации
+validation:
+  order:
+    max-items: 50
+    max-note-length: 1000
+  customer:
+    name:
+      min-length: 2
+      max-length: 100
+    phone:
+      pattern: "^\\+?[1-9]\\d{1,14}$"
